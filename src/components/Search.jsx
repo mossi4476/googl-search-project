@@ -1,33 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from 'react';
+import { useDebounce } from 'use-debounce';
 
-import { useDebounce } from "use-debounce";
-import { useStateContext } from "../../../project_google_clone/src/contexts/StateContextProvider";
+import { useStateContext } from '../contexts/StateContextProvider';
+import { Links } from './Links';
 
-import { Links } from "./Links";
 export const Search = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
-  const { setSearchTerm: setSearchTermContext } = useStateContext();
+  const { setSearchTerm } = useStateContext();
+  const [text, setText] = useState('Elon Musk');
+  const [debouncedValue] = useDebounce(text, 300);
 
   useEffect(() => {
-    setSearchTermContext(debouncedSearchTerm);
-  }, [debouncedSearchTerm, setSearchTermContext]);
+    if (debouncedValue) setSearchTerm(debouncedValue);
+  }, [debouncedValue]);
 
   return (
-    <div className="flex items-center">
+    <div className="relative sm:ml-48 md:ml-72 sm:-mt-10 mt-3">
       <input
-        className="bg-gray-100 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+        value={text}
         type="text"
-        placeholder="Search Google"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        className="sm:w-96 w-80 h-10 dark:bg-gray-200  border rounded-full shadow-sm outline-none p-6 text-black hover:shadow-lg"
+        placeholder="🔎 Search Google or type URL"
+        onChange={(e) => setText(e.target.value)}
       />
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        type="button"
-      >
-        Search
-      </button>
+      {text !== '' && (
+        <button type="button" className="absolute top-1.5 right-4 text-2xl text-gray-500 " onClick={() => setText('')}>
+          x
+        </button>
+      )}
+      <Links />
     </div>
   );
 };

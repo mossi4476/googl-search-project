@@ -1,28 +1,35 @@
-import React from "react";
-const StateContext = createStateContext();
-const baseUrl = "https://google-search3.p.rapidapi.com/api/v1";
+import React, { createContext, useContext, useState } from 'react';
+
+const StateContext = createContext();
+const baseUrl = 'https://google-search3.p.rapidapi.com/api/v1';
 
 export const StateContextProvider = ({ children }) => {
-  const [result, setResult] = useState([]);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const getResults = async () => {
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const getResults = async (url) => {
     setLoading(true);
-    const response = await fetch(`${baseUrl}/search?q=${searchTerm}`, {
-      method: "GET",
+
+    const res = await fetch(`${baseUrl}${url}`, {
+      method: 'GET',
       headers: {
-        "x-rapidapi-host": "google-search3.p.rapidapi.com",
-        "x-rapidapi-key": "e9a9f6e9a1msh5b5f8f8b5c8e5f5p1e5d8ejsn9b9c5f7d5d5c",
+        'x-rapidapi-host': 'google-search3.p.rapidapi.com',
+        'x-rapidapi-key': process.env.REACT_APP_API_KEY,
       },
     });
-    const data = await response.json();
-    setResult(data.results);
+
+    const data = await res.json();
+
+    setResults(data);
     setLoading(false);
   };
-  return;
-  <StateContext.Provider
-    value={{ result, loading, getResults, searchTerm, setSearchTerm }}
-  >
-    {children}
-  </StateContext.Provider>;
+
+  return (
+    <StateContext.Provider value={{ getResults, results, searchTerm, setSearchTerm, loading }}>
+      {children}
+    </StateContext.Provider>
+  );
 };
+
+export const useStateContext = () => useContext(StateContext);
